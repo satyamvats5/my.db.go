@@ -18,6 +18,23 @@ type (
 	}
 )
 
+type meta_command_result bool
+
+const (
+	meta_command_success              meta_command_result = true
+	meta_command_unrecognized_command meta_command_result = false
+)
+
+func is_meta_command(inputbuffer *InputBuffer) meta_command_result {
+	if strings.Compare(inputbuffer.buffer, ".exit") == 0 {
+		fmt.Fprintf(os.Stdout, "Exitting Bye!")
+		os.Exit(0)
+	}
+
+	return meta_command_unrecognized_command
+
+}
+
 func read_input(scanner *bufio.Reader) InputBuffer {
 	txt, err := scanner.ReadString('\n')
 	var buffer InputBuffer
@@ -39,13 +56,15 @@ func main() {
 	scanner := bufio.NewReader(os.Stdin)
 	for {
 		print_prompt()
-		switch buffer := read_input(scanner).buffer; buffer {
-		case ".exit":
-			fmt.Fprintf(os.Stdout, "Exitting Bye!")
-			os.Exit(0)
-
-		default:
-			fmt.Fprintf(os.Stdout, "Unrecognised Command: %s.\n", buffer)
+		input_buffer := read_input(scanner)
+		if input_buffer.buffer[0] == '.' {
+			switch result := is_meta_command(&input_buffer); result {
+			case meta_command_success:
+				continue
+			case meta_command_unrecognized_command:
+				fmt.Fprintf(os.Stdout, "Unrecognised Command: %s.\n", input_buffer.buffer)
+				continue
+			}
 		}
 	}
 }
