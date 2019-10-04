@@ -4,24 +4,37 @@
 #                                #
 ##################################
 
+# MACRO Definitions
+define RECURSIVE_DIR
+./...
+endef
+
+define TESTING_COMMENT
+@-echo "Testing Application"
+@-echo
+endef
+
+define START_COMMENT
+@-echo
+@-echo
+@-echo "Starting Application"
+@-echo
+endef
+
 # Linker Flags
-LDFLAGS=
+LDFLAGS=-race
 
 # Source Directory
 SRC=src
 
-# Third-party Sources
-# LIB=vendor
-
 # Output Directory
 BIN=bin
 
-# Executable File and Path
-EXE=DB
+# Executable File Name
+EXE=cli
 
 # Source Package(s)
-SRCDIRS=$(dir $(wildcard $(SRC)/*/))
-PACKAGES=$(sort $(patsubst $(SRC)/%/, %\\n, $(SRCDIRS)))
+PACKAGES=$(sort $(patsubst $(SRC)/%/, %\\n, $(dir $(wildcard $(SRC)/*/))))
 
 # Compiler
 CC=go
@@ -29,30 +42,43 @@ CC=go
 # Compiler Commands
 GOGET=install
 GOBUILD=build
+GORUN=run
+GOTEST=test
 GOCLEAN=clean
 
 # Go Variables
-GOBASE := $(shell pwd)
-GOPATH := $(GOBASE)/$(SRC)
-GOBIN := $(GOBASE)/$(BIN)
-GOFILES := $(wildcard $(SRC)/**/*.go)
+GOBASE=$(shell pwd)
+GOPATH=$(GOBASE)/$(SRC)
+GOBIN=$(GOBASE)/$(BIN)
+GOSOURCE=$(sort $(patsubst $(SRC)/%/, %, $(dir $(wildcard $(SRC)/**/*.go))))
 
-# Build Executable from All Source Files
-all: get
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) $(CC) $(GOBUILD) $(LDFLAGS) -o $(GOBIN)/$(EXE) $(GOFILES)
-
+# Default Makefile Target
+all: build
 .PHONY: all
 
+# Build Executable from All Source Files
+build: get
+	@GOPATH=$(GOBASE) GOBIN=$(GOBIN) $(CC) $(GOBUILD) $(LDFLAGS) $(GOSOURCE)
+
+.PHONY: build
+
+# Unit Test Modules
+test: get
+	$(TESTING_COMMENT)
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) $(CC) $(GOTEST) $(RECURSIVE_DIR)
+
+.PHONY: test
+
 # Run executable
-run: all
-	@-echo "Starting Application"
-	@$(BIN)/$(EXE)
+run: build test
+	$(START_COMMENT)
+	@GOPATH=$(GOBASE) GOBIN=$(GOBIN) $(CC) $(GORUN) $(LDFLAGS) $(GOSOURCE)
 
 .PHONY: run
 
 # Fetch Dependency
 get:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) $(CC) $(GOGET) $(GOFILES)
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) $(CC) $(GOGET) $(RECURSIVE_DIR)
 
 .PHONY: get
 
@@ -63,6 +89,7 @@ help: Makefile
 	@-echo "Binary Path:" $(GOBIN)
 	@-echo "Local Packages:\n" $(PACKAGES)
 	@-echo "Run 'make all' to build Application"
+	@-echo "Run 'make test' to test Application"
 
 .PHONY: help
 
