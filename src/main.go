@@ -1,7 +1,7 @@
 package main
 
 import (
-	"MY_DB/cli"
+	"cli"
 )
 
 func main() {

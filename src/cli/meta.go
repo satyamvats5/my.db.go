@@ -1,10 +1,10 @@
 package cli
 
 import (
-	"MY_DB/utils"
 	"fmt"
 	"os"
 	"strings"
+	"utils"
 )
 
 // IsMetaCommand is used to validate that whether the given meta command is valid or not.

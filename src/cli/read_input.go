@@ -1,11 +1,11 @@
 package cli
 
 import (
-	"MY_DB/utils"
 	"bufio"
 	"fmt"
 	"os"
 	"strings"
+	"utils"
 )
 
 func readInput(scanner *bufio.Reader) utils.InputBuffer {

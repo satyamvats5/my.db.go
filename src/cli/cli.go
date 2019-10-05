@@ -1,11 +1,11 @@
 package cli
 
 import (
-	"MY_DB/parser"
-	"MY_DB/utils"
 	"bufio"
 	"fmt"
 	"os"
+	"parser"
+	"utils"
 )
 
 // LoadCli is loading the Command Line INterface for out DB.

@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"MY_DB/utils"
 	"strings"
+	"utils"
 )
 
 // IsSQLCommand Will validate whether a givencommand is SQL COmmand or not.
